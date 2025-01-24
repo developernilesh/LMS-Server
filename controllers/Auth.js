@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const OTP = require("../models/OTP");
+const Profile = require("../models/Profile")
 const otpGenerator = require('otp-generator')
+const bcrypt = require('bcrypt')
 
 const generateOTP = () => {
   return otpGenerator.generate(6, {
@@ -51,46 +53,73 @@ exports.sendOTP = async (req, res) => {
 
 // Signup
 exports.signUp = async (req, res) => {
-  // fetching data from request's body
-  const { firstName, lastName, email, password, confirmPassword, accountType, contact, otp } = req.body
+  try {
+    // fetching data from request's body
+    const { firstName, lastName, email, password, confirmPassword, accountType, contact, otp } = req.body
 
-  // validations for input fields
-  if (!firstName || !lastName || !email || !password || !confirmPassword || !accountType || !contact || !otp) {
-    res.status(403).json({
+    // validations for input fields
+    if (!firstName || !lastName || !email || !password || !confirmPassword || !accountType || !contact || !otp) {
+      res.status(403).json({
+        success: false,
+        message: "Please fill all the required fileds"
+      })
+    }
+
+    // checking if confirm password matches original passowrd
+    if (password !== confirmPassword) {
+      res.status(400).json({
+        success: false,
+        message: "Confirm password doesn't match the original passowrd. Please try again!"
+      })
+    }
+
+    // checking if user already exists
+    const isExistingUser = await User.findOne({ email });
+    if (isExistingUser) {
+      return res.status(401).json({
+        success: false,
+        message: "User already registered",
+      });
+    }
+
+    // finding most recent otp for the user
+    const recentOTP = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1)
+
+    // validation for the otp
+    if (!recentOTP.length || otp !== recentOTP.otp) {
+      return res.status(401).json({
+        success: false,
+        message: "OTP is not valid",
+      });
+    }
+
+    // passowrd hashing
+    const hashedPassword = await bcrypt.hash(password, 10)
+
+    // creating entry in DB
+    const profileDetails = await Profile.create({
+      gender: null,
+      dateOfBirth: null,
+      about: null,
+    })
+
+    const userDetails = await User.create({
+      firstName, lastName, email, password: hashedPassword, contact, accountType, additionalDetails: profileDetails._id,
+      image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`
+    })
+
+    // sending response
+    res.status(200).json({
+      success: true,
+      message: "User Registered Successfully",
+      userDetails
+    })
+  } catch (error) {
+    res.status(500).json({
       success: false,
-      message: "Please fill all the required fileds"
+      message: "Unable to Register User. Please Try Again!"
     })
   }
-
-  // checking if confirm password matches original passowrd
-  if (password !== confirmPassword) {
-    res.status(400).json({
-      success: false,
-      message: "Confirm password doesn't match the original passowrd. Please try again!"
-    })
-  }
-
-  // checking if user already exists
-  const isExistingUser = await User.findOne({ email });
-  if (isExistingUser) {
-    return res.status(401).json({
-      success: false,
-      message: "User already registered",
-    });
-  }
-
-  // finding most recent otp for the user
-  const recentOTP = await OTP.find({email}).sort({createdAt:-1}).limit(1)
-
-  // validation for the otp
-  if(!recentOTP.length || otp!==recentOTP.otp){
-    return res.status(401).json({
-      success: false,
-      message: "OTP is not valid",
-    });
-  }
-  
-  // passowrd hashing
 }
 
 // Login

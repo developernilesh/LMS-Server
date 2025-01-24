@@ -5,7 +5,6 @@ const userSchema = new mongoose.Schema({
   lastName: { type: String, required: true, trim: true },
   email: { type: String, required: true, trim: true },
   password: { type: String, required: true },
-  confirmPassword: { type: String, required: true },
   contact: { type: Number, required: true },
   accountType: {
     type: String,
@@ -16,6 +15,7 @@ const userSchema = new mongoose.Schema({
   additionalDetails: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Profile",
+    required: true,
   },
   courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
   courseProgress: [
