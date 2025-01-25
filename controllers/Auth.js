@@ -3,6 +3,8 @@ const OTP = require("../models/OTP");
 const Profile = require("../models/Profile")
 const otpGenerator = require('otp-generator')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+require("dotenv").config();
 
 const generateOTP = () => {
   return otpGenerator.generate(6, {
@@ -59,7 +61,7 @@ exports.signUp = async (req, res) => {
 
     // validations for input fields
     if (!firstName || !lastName || !email || !password || !confirmPassword || !accountType || !contact || !otp) {
-      res.status(403).json({
+      return res.status(401).json({
         success: false,
         message: "Please fill all the required fileds"
       })
@@ -67,7 +69,7 @@ exports.signUp = async (req, res) => {
 
     // checking if confirm password matches original passowrd
     if (password !== confirmPassword) {
-      res.status(400).json({
+      return res.status(401).json({
         success: false,
         message: "Confirm password doesn't match the original passowrd. Please try again!"
       })
@@ -117,11 +119,69 @@ exports.signUp = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Unable to Register User. Please Try Again!"
+      message: error.message
     })
   }
 }
 
 // Login
+exports.login = async (req, res) => {
+  try {
+    // fetching data from request's body
+    const { email, password } = req.body
+
+    // validation for the inputs
+    if (!email || !password) {
+      return res.status(401).json({
+        success: false,
+        message: "Please fill all the required fileds"
+      })
+    }
+
+    // cheching if user exists
+    let user = await User.findOne({ email })
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User is not registered"
+      })
+    }
+
+    // verify password and generate a JWT token
+    if (await bcrypt.compare(password, user.password)) {
+      const payload = {
+        email: user.email,
+        id: user._id,
+        role: user.accountType,
+      }
+      let token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '2h' })
+      user["token"] = token;
+      user["password"] = undefined;
+
+      // generate cookie
+      const options = {
+        expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+        httpOnly: true,
+      }
+      res.cookie("token", token, options).status(200).json({
+        success: true,
+        token,
+        user,
+        message: 'User logged in successfully'
+      })
+    } else {
+      // password does not match
+      return res.status(401).json({
+        success: false,
+        message: 'Incorrect Password'
+      })
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+}
 
 // Change Passowrd
