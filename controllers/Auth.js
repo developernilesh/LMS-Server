@@ -185,3 +185,14 @@ exports.login = async (req, res) => {
 }
 
 // Change Passowrd
+exports.changePassowrd = (req,res) => {
+  // fetching data from req body
+
+  // validations for input fileds
+
+  // updating passowrd in database
+
+  // sending mail - Passowrd Update
+
+  // return response
+}
