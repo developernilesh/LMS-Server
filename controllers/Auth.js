@@ -185,14 +185,31 @@ exports.login = async (req, res) => {
 }
 
 // Change Passowrd
-exports.changePassowrd = (req,res) => {
-  // fetching data from req body
+exports.changePassowrd = (req, res) => {
+  try {
+    // fetching data from req body
+    const { oldPassowrd, newPassowrd, confirmNewPassword } = req.body
 
-  // validations for input fileds
+    // validations for input fileds
+    if (!oldPassowrd || !newPassowrd || !confirmNewPassword) {
+      return res.status(401).json({
+        success: false,
+        message: "Please fill all the required fileds"
+      })
+    }
+    if (newPassowrd !== confirmNewPassword) {
+      return res.status(401).json({
+        success: false,
+        message: "Confirm password doesn't match the original passowrd. Please try again!"
+      })
+    }
 
-  // updating passowrd in database
+    // updating passowrd in database
 
-  // sending mail - Passowrd Update
+    // sending mail - Passowrd Update
 
-  // return response
+    // return response
+  } catch (error) {
+
+  }
 }
