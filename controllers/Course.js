@@ -18,8 +18,8 @@ exports.createCourse = async (req, res) => {
     }
 
     // fetching instructor details
-    const constructorDetails = await User.findById(req.user.id)
-    if(!constructorDetails){
+    const instructorDetails = await User.findById(req.user.id)
+    if (!instructorDetails) {
       res.status(401).json({
         success: false,
         message: "Cannot Fetch Instructor Details!"
@@ -28,7 +28,7 @@ exports.createCourse = async (req, res) => {
 
     // fetching tag details
     const tagDetails = await Tags.findById(tag)
-    if(!tagDetails){
+    if (!tagDetails) {
       res.status(401).json({
         success: false,
         message: "Cannot Fetch Tag Details!"
@@ -39,6 +39,45 @@ exports.createCourse = async (req, res) => {
     const thumbNail = await uploadToCloudinary(thumbnailImage, process.env.FOLDER_NAME)
 
     // creating course entry in db
-    const newCourse = await Course.create({})
-  } catch (error) { }
+    const newCourse = await Course.create({
+      courseName, courseDescription, instructor: instructorDetails._id, whatYouWillLearn, price,
+      thumbNail: thumbNail.secure_url, tag: tagDetails._id
+    })
+
+    // updating instructor by adding course id in courses array of the instructor
+    await User.findByIdAndUpdate(instructorDetails._id, { $push: { courses: newCourse._id } }, { new: true })
+
+    // updating instructor by adding course id in courses array of the instructor
+    await Tags.findByIdAndUpdate(tagDetails._id, { $push: { courses: newCourse._id } }, { new: true })
+
+    // success response
+    res.status(200).json({
+      success: true,
+      message: "Course Created Successfully!"
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
 };
+
+// fetching all courses
+exports.showAllCourses = async (req, res) => {
+  try {
+    const allCourses = await Course.find({},
+      {courseName:true,price:true,thumbNail:true,instructor:true,ratingAndReview:true,studentsEnrolled:true}
+    ).populate("instructor").exec()
+
+    res.status(200).json({
+      success: false,
+      message: "All courses fetched successfully!"
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+}

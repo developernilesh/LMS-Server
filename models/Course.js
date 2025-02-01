@@ -10,7 +10,7 @@ const courseScehma = new mongoose.Schema({
   },
   whatYouWillLearn: { type: String, trim: true },
   courseContent: [
-    { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Section" },
+    { type: mongoose.Schema.Types.ObjectId, ref: "Section" },
   ],
   ratingAndReview: [
     { type: mongoose.Schema.Types.ObjectId, ref: "RatingAndReview" },
@@ -22,7 +22,7 @@ const courseScehma = new mongoose.Schema({
     ref: "Tag",
   },
   studentsEnrolled: [
-    { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
+    { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   ],
 });
 
