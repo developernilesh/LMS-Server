@@ -17,9 +17,9 @@ const courseScehma = new mongoose.Schema({
   ],
   price: { type: Number, required: true },
   thumbNail: { type: String },
-  tag: {
+  category: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Tag",
+    ref: "Category",
   },
   studentsEnrolled: [
     { type: mongoose.Schema.Types.ObjectId, ref: "User" },

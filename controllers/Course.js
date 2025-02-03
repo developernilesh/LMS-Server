@@ -1,16 +1,16 @@
 const User = require("../models/User");
-const Tags = require("../models/Tags");
+const Category = require("../models/Category");
 const Course = require("../models/Course");
 const { uploadToCloudinary } = require("../utils/ImageUploader");
 
 exports.createCourse = async (req, res) => {
   try {
     // fetching data from req
-    const { courseName, courseDescription, whatYouWillLearn, price, tag } = req.body
+    const { courseName, courseDescription, whatYouWillLearn, price, category } = req.body
     const thumbnailImage = req.files.thumbnail
 
     // input validation
-    if (!courseName || !courseDescription || !whatYouWillLearn || !price || !tag || !thumbnailImage) {
+    if (!courseName || !courseDescription || !whatYouWillLearn || !price || !category || !thumbnailImage) {
       res.status(401).json({
         success: false,
         message: "Please fill all the required fileds!"
@@ -26,12 +26,12 @@ exports.createCourse = async (req, res) => {
       })
     }
 
-    // fetching tag details
-    const tagDetails = await Tags.findById(tag)
-    if (!tagDetails) {
+    // fetching category details
+    const categoryDetails = await Category.findById(category)
+    if (!categoryDetails) {
       res.status(401).json({
         success: false,
-        message: "Cannot Fetch Tag Details!"
+        message: "Cannot Fetch category Details!"
       })
     }
 
@@ -41,14 +41,14 @@ exports.createCourse = async (req, res) => {
     // creating course entry in db
     const newCourse = await Course.create({
       courseName, courseDescription, instructor: instructorDetails._id, whatYouWillLearn, price,
-      thumbNail: thumbNail.secure_url, tag: tagDetails._id
+      thumbNail: thumbNail.secure_url, category: categoryDetails._id
     })
 
     // updating instructor by adding course id in courses array of the instructor
     await User.findByIdAndUpdate(instructorDetails._id, { $push: { courses: newCourse._id } }, { new: true })
 
     // updating instructor by adding course id in courses array of the instructor
-    await Tags.findByIdAndUpdate(tagDetails._id, { $push: { courses: newCourse._id } }, { new: true })
+    await Category.findByIdAndUpdate(categoryDetails._id, { $push: { courses: newCourse._id } }, { new: true })
 
     // success response
     res.status(200).json({
