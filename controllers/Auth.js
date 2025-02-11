@@ -61,10 +61,10 @@ exports.sendOTP = async (req, res) => {
 exports.signUp = async (req, res) => {
   try {
     // fetching data from request's body
-    const { firstName, lastName, email, password, confirmPassword, accountType, contact, otp } = req.body
+    const { firstName, lastName, email, password, confirmPassword, accountType, otp } = req.body
 
     // validations for input fields
-    if (!firstName || !lastName || !email || !password || !confirmPassword || !accountType || !contact || !otp) {
+    if (!firstName || !lastName || !email || !password || !confirmPassword || !accountType || !otp) {
       return res.status(401).json({
         success: false,
         message: "Please fill all the required fileds"
@@ -110,7 +110,7 @@ exports.signUp = async (req, res) => {
     })
 
     const userDetails = await User.create({
-      firstName, lastName, email, password: hashedPassword, contact, accountType, additionalDetails: profileDetails._id,
+      firstName, lastName, email, password: hashedPassword, accountType, additionalDetails: profileDetails._id,
       image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`
     })
 
