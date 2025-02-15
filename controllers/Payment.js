@@ -3,6 +3,7 @@ const Course = require("../models/Course");
 const User = require("../models/User");
 const mailSender = require("../utils/MailSender");
 const mongoose = require("mongoose");
+require("dotenv").config();
 
 exports.capturePayment = async (req, res) => {
   try {

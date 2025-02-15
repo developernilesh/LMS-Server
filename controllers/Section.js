@@ -76,6 +76,7 @@ exports.updateSection = async (req, res) => {
   }
 };
 
+// deleting a section
 exports.deleteSection = async (req, res) => {
   try {
     // fetching data from req body

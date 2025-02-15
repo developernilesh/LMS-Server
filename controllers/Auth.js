@@ -195,8 +195,27 @@ exports.login = async (req, res) => {
   }
 }
 
+// logout
+exports.logout = async (req, res) => {
+  try {
+    // clearing the cookie
+    res.clearCookie("token");
+
+    // returning response
+    res.status(200).json({
+      success: true,
+      message: "User logged out successfully"
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: `Something went wrong: ${error.message}`
+    })
+  }
+}
+
 // Change Passowrd
-exports.changePassowrd = async (req, res) => {
+exports.changePassword = async (req, res) => {
   try {
     // fetching data from req body
     const { email, oldPassword, newPassword, confirmNewPassword } = req.body

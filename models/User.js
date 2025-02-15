@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
     enum: ["Admin", "Student", "Instructor"],
     required: true,
   },
-  image: { type: String, required: true },
+  image: { type: String },
   additionalDetails: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Profile",
@@ -22,6 +22,6 @@ const userSchema = new mongoose.Schema({
   ],
   token: { type: String },
   resetPasswordExpiresIn: { type: Date },
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model("User", userSchema)
