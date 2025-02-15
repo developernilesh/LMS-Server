@@ -68,3 +68,5 @@ router.get("/get-average-rating", getAverageRating);
 
 // getting all ratings and reviews
 router.get("/get-all-ratings-and-reviews", getAllRatingsAndReviews);
+
+module.exports = router;
