@@ -83,7 +83,7 @@ exports.showAllCourses = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: `Something went wrong: ${error.message}`
     })
   }
 }
@@ -116,7 +116,7 @@ exports.getCourseDetails = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: `Something went wrong while fetching course details: ${error.message}`
+      message: `Something went wrong: ${error.message}`
     })
   }
 }
