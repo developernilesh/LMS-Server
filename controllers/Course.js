@@ -77,7 +77,7 @@ exports.showAllCourses = async (req, res) => {
     ).populate("instructor").exec()
 
     res.status(200).json({
-      success: false,
+      success: true,
       message: "All courses fetched successfully!",
       allCourses
     })

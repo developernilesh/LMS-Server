@@ -106,7 +106,7 @@ exports.updateSubSection = async (req, res) => {
 }
 
 // deletion of a sub-section
-exports.deleteSubSection = async (res,res) => {
+exports.deleteSubSection = async (req,res) => {
   try {
     // fetching the sub-section id
     const { subSectionId } = req.body

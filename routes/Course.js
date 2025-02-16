@@ -5,7 +5,7 @@ const router = express.Router();
 const { auth, isStudent, isInstructor, isAdmin } = require("../middlewares/auth");
 
 // importing controllers
-const { createCourse, getAllCourses, getCourseDetails } = require("../controllers/Course");
+const { createCourse, getCourseDetails, showAllCourses } = require("../controllers/Course");
 const { createSection, updateSection, deleteSection } = require("../controllers/Section");
 const { createSubSection, updateSubSection, deleteSubSection } = require("../controllers/SubSection");
 const { createCategory, showAllCategories, categoryPageDetails } = require("../controllers/Category");
@@ -37,7 +37,7 @@ router.put("/update-sub-section", auth, isInstructor, updateSubSection);
 router.delete("/delete-sub-section", auth, isInstructor, deleteSubSection);
 
 // getting all courses
-router.get("/get-all-courses", getAllCourses);
+router.get("/get-all-courses", showAllCourses);
 
 // getting Details for a Specific Courses
 router.get("/get-courses-details", getCourseDetails);
