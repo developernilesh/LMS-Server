@@ -12,13 +12,13 @@ exports.createSubSection = async (req, res) => {
 
     // input validations
     if (!title || !timeDuration || !description || !videoToUpload) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Please fill all the required fields",
       })
     }
     if (!sectionId) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot create sub-section at moment. Please try again!",
       })
@@ -27,7 +27,7 @@ exports.createSubSection = async (req, res) => {
     // uploading video to cloudinary
     const uploadedVideo = await uploadToCloudinary(videoToUpload, process.env.FOLDER_NAME)
     if (!uploadedVideo) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Failed to upload the video. Please try again!",
       })
@@ -61,13 +61,13 @@ exports.updateSubSection = async (req, res) => {
 
     // input validations
     if (!title || !timeDuration || !description || !subSectionId) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Please fill all the required fields",
       })
     }
     if (!subSectionId) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot create sub-section at moment. Please try again!",
       })
@@ -79,7 +79,7 @@ exports.updateSubSection = async (req, res) => {
       // Upload new video to Cloudinary
       const uploadedVideo = await uploadToCloudinary(videoToUpload, process.env.FOLDER_NAME)
       if (!uploadedVideo) {
-        return res.status(401).json({
+        return res.status(400).json({
           success: false,
           message: "Failed to upload the video. Please try again!",
         })
@@ -113,7 +113,7 @@ exports.deleteSubSection = async (req,res) => {
 
     // input validation
     if (!subSectionId) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot delete sub-section at moment. Please try again!",
       })

@@ -10,7 +10,7 @@ exports.auth = (req, res, next) => {
 
     // checking if token exists
     if (!token) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Token is missing",
       })
@@ -19,7 +19,7 @@ exports.auth = (req, res, next) => {
     // validating the token
     const decode = jwt.verify(token, process.env.JWT_SECRET)
     if (!decode) {
-      return res.status(401).json({
+      return res.status(400).json({
         successs: false,
         message: "token is invalid"
       })
@@ -29,7 +29,7 @@ exports.auth = (req, res, next) => {
     // allowing to go to the next middleware
     next();
   } catch (error) {
-    return res.status(500).json({
+    return res.status(400).json({
       successs: false,
       message: "Something went wrong while verifying token"
     })
@@ -40,14 +40,14 @@ exports.auth = (req, res, next) => {
 exports.isStudent = (req, res, next) => {
   try {
     if (req.user.accountType !== 'Student') {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: 'This is a protected route for students'
       })
     }
     next();
   } catch (error) {
-    return res.status(500).json({
+    return res.status(400).json({
       success: false,
       message: 'User role cannot be verified. Please try again!'
     })
@@ -58,14 +58,14 @@ exports.isStudent = (req, res, next) => {
 exports.isInstructor = (req, res, next) => {
   try {
     if (req.user.accountType !== 'Instructor') {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: 'This is a protected route for Instructors'
       })
     }
     next();
   } catch (error) {
-    return res.status(500).json({
+    return res.status(400).json({
       success: false,
       message: 'User role cannot be verified. Please try again!'
     })
@@ -76,14 +76,14 @@ exports.isInstructor = (req, res, next) => {
 exports.isAdmin = (req, res, next) => {
   try {
     if (req.user.accountType !== 'Admin') {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: 'This is a protected route for Admins'
       })
     }
     next();
   } catch (error) {
-    return res.status(500).json({
+    return res.status(400).json({
       success: false,
       message: 'User role cannot be verified. Please try again!'
     })

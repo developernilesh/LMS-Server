@@ -11,13 +11,13 @@ exports.updateProfile = async (req, res) => {
 
     // input validations
     if (!contact || !gender) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Please fill the required fields!",
       });
     }
     if (!userId) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot update profile at moment. Please try again!",
       });
@@ -26,7 +26,7 @@ exports.updateProfile = async (req, res) => {
     // fetching the user details
     const userDetails = await User.findById(userId);
     if (!userDetails) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "User not found. Please try again!",
       });
@@ -35,7 +35,7 @@ exports.updateProfile = async (req, res) => {
     // fetching profile id from user details
     const profileId = userDetails?.additionalDetails;
     if (!profileId) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "User profile not found. Please try again!",
       });
@@ -44,7 +44,7 @@ exports.updateProfile = async (req, res) => {
     // fetching profile details
     const profileDetails = await Profile.findById(profileId);
     if (!profileDetails) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "User profile not found. Please try again!",
       });
@@ -78,7 +78,7 @@ exports.deleteAccount = async (req, res) => {
 
     // input validations
     if (!userId) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot delete account at moment. Please try again!",
       });
@@ -87,7 +87,7 @@ exports.deleteAccount = async (req, res) => {
     // fetching the user details
     const userDetails = await User.findById(userId);
     if (!userDetails) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot delete account at moment. Please try again!",
       });
@@ -120,7 +120,7 @@ exports.getAllUserDetails = async (req, res) => {
 
     // input validations
     if (!userId) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot get user details at moment. Please try again!",
       });
@@ -131,7 +131,7 @@ exports.getAllUserDetails = async (req, res) => {
       .populate("additionalDetails")
       .exec();
     if (!userDetails) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot get user details at moment. Please try again!",
       });
@@ -155,18 +155,19 @@ exports.getAllUserDetails = async (req, res) => {
 exports.updateDisplayPicture = async (req, res) => {
   try {
     // fetching the display picture
-    const displayPicture = req.files.displayPicture;
+    console.log(req.files.displayPicture);
+    const displayPicture = req?.files?.displayPicture;
     const userId = req.user.id;
 
     // input validations
     if (!displayPicture) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
-        message: "Cannot update display picture at moment. Please try again!",
+        message: "Please upload a display picture!",
       });
     }
     if (!userId) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot update display picture at moment. Please try again!",
       });
@@ -175,12 +176,12 @@ exports.updateDisplayPicture = async (req, res) => {
     // fetching the user details
     const userDetails = await User.findById(userId);
     if (!userDetails) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot update display picture at moment. Please try again!",
       });
     }
-
+    console.log("userDetails : ", userDetails);
     // uploading the display picture to cloudinary
     const image = await uploadToCloudinary(
       displayPicture,
@@ -188,7 +189,14 @@ exports.updateDisplayPicture = async (req, res) => {
       1000,
       1000
     )
-    
+    if (!image) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot update display picture at moment. Please try again!",
+      });
+    }
+    console.log("image : ", image);
+
     // updating the user details
     const updatedProfile = await User.findByIdAndUpdate(
       { _id: userId },
@@ -196,12 +204,12 @@ exports.updateDisplayPicture = async (req, res) => {
       { new: true }
     )
     if (!updatedProfile) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot update display picture at moment. Please try again!",
       });
     }
-
+    console.log("updatedProfile : ", updatedProfile);
     // success response
     res.status(200).json({
       success: true,
@@ -223,7 +231,7 @@ exports.getEnrolledCourses = async (req, res) => {
 
     // input validations
     if (!userId) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot get enrolled courses at moment. Please try again!",
       });
@@ -235,7 +243,7 @@ exports.getEnrolledCourses = async (req, res) => {
       .exec();
 
     if (!userDetails) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot get enrolled courses at moment. Please try again!",
       });
@@ -254,4 +262,3 @@ exports.getEnrolledCourses = async (req, res) => {
     })
   }
 }
-

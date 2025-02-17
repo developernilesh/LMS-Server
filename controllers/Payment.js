@@ -13,13 +13,13 @@ exports.capturePayment = async (req, res) => {
 
     // input validations
     if (!userId) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot fetch user details. Please try again!",
       });
     }
     if (!courseId) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot fetch course details. Please try again!",
       });
@@ -28,7 +28,7 @@ exports.capturePayment = async (req, res) => {
     // courseDetails validation
     const course = await Course.findById(courseId);
     if (!course) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot fetch course details. Please try again!",
       });
@@ -37,7 +37,7 @@ exports.capturePayment = async (req, res) => {
     // checking if user already paid for this course
     const uid = new mongoose.Types.ObjectId(userId);
     if (course.studentsEnrolled.includes(uid)) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Student is already enrolled in this course",
       });
@@ -54,7 +54,7 @@ exports.capturePayment = async (req, res) => {
     };
     const paymentDetails = await razorpayInstance.orders.create(options);
     if (!paymentDetails) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Could not initiate payment. Please try again!",
       });
@@ -91,7 +91,7 @@ exports.verifyPayment = async (req, res) => {
 
     // checking if payment is valid
     if (expectedSignature !== razorpaySignature) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Payment not verified. Please try again!",
       });
@@ -108,7 +108,7 @@ exports.verifyPayment = async (req, res) => {
       { new: true }
     );
     if (!enrolledCourse) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Course not found!",
       });
@@ -121,7 +121,7 @@ exports.verifyPayment = async (req, res) => {
       { new: true }
     );
     if (!enrolledStudent) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "User not found!",
       });

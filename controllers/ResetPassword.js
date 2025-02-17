@@ -1,5 +1,7 @@
 const User = require("../models/User");
 const mailSender = require("../utils/MailSender");
+const crypto = require("crypto");
+const bcrypt = require("bcrypt");
 
 // generate token
 exports.resetPasswordToken = async (req, res) => {
@@ -7,7 +9,7 @@ exports.resetPasswordToken = async (req, res) => {
     // fetching email from request body
     const { email } = req.body;
     if (!email) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Please enter your email to reset password!",
       });
@@ -16,7 +18,7 @@ exports.resetPasswordToken = async (req, res) => {
     // checking if user exists for the email
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Your email is not registered here.",
       });
@@ -32,7 +34,7 @@ exports.resetPasswordToken = async (req, res) => {
       { new: true }
     );
     if (!updatedUser) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot reset password. Please try again!",
       });
@@ -42,7 +44,7 @@ exports.resetPasswordToken = async (req, res) => {
     const url = `http://localhost:3000/update-password/${token}`
 
     // sending mail containing the url
-    await mailSender(email, "Password reset link", `Passowrd reset link : ${url}`);
+    await mailSender(email, "Password reset link", `Password reset link : ${url}`);
 
     // returning response
     res.status(200).json({
@@ -65,21 +67,21 @@ exports.resetPassword = async (req, res) => {
 
     // validations
     if (!resetPassword || !confirmResetPassword) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Please fill the required fileds!",
       });
     }
 
     if (resetPassword !== confirmResetPassword) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
-        message: "Confirm password doesn't match the original passowrd. Please try again!"
+        message: "Confirm password doesn't match the original Password. Please try again!"
       });
     }
 
     if (!token) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot reset password. Please try again!",
       });
@@ -88,7 +90,7 @@ exports.resetPassword = async (req, res) => {
     // fetching user on the basis of token
     const user = await User.findOne({ token })
     if (!user) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot fetch userdetails. Please try again!",
       });
@@ -96,7 +98,7 @@ exports.resetPassword = async (req, res) => {
 
     // expiry time validation of the token
     if (user.resetPasswordExpiresIn < Date.now()) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Session expired. Please try again!",
       });
@@ -105,7 +107,7 @@ exports.resetPassword = async (req, res) => {
     // hashing the password
     const hashedResetPassword = await bcrypt.hash(resetPassword, 10)
     if (!hashedResetPassword) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Failed to reset password. Please try again!",
       });
@@ -114,7 +116,7 @@ exports.resetPassword = async (req, res) => {
     // updating the password of the user in db
     const resetUserPassword = await User.findOneAndUpdate({ token }, { password: hashedResetPassword }, { new: true })
     if (!resetUserPassword) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Failed to reset password. Please try again!",
       });
@@ -123,7 +125,7 @@ exports.resetPassword = async (req, res) => {
     // success rensponse
     res.status(200).json({
       success: true,
-      message: "Passowrd updated successfully",
+      message: "Password updated successfully",
     })
   } catch (error) {
     res.status(500).json({

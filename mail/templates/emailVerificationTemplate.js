@@ -26,6 +26,9 @@ const otpTemplate = (otp) => {
 			.logo {
 				max-width: 200px;
 				margin-bottom: 20px;
+				background-color: #000;
+				padding: 10px;
+				border-radius: 10px;
 			}
 	
 			.message {

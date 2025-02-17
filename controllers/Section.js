@@ -9,13 +9,13 @@ exports.createSection = async (req, res) => {
 
     // validations
     if (!sectionName) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Please put the section name!"
       })
     }
     if (!sectionId) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Unable to update section. Please try again!"
       })
@@ -48,13 +48,13 @@ exports.updateSection = async (req, res) => {
 
     // validations
     if (!sectionName) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Please put the section name!"
       })
     }
     if (!sectionId) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Unable to update the Section. Please try again!"
       })
@@ -84,7 +84,7 @@ exports.deleteSection = async (req, res) => {
 
     // validations
     if (!sectionId) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Unable to delete the section. Please try again!"
       })

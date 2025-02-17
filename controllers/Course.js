@@ -12,7 +12,7 @@ exports.createCourse = async (req, res) => {
 
     // input validation
     if (!courseName || !courseDescription || !whatYouWillLearn || !price || !category || !thumbnailImage || !instructions || !tags) {
-      res.status(401).json({
+      res.status(400).json({
         success: false,
         message: "Please fill all the required fileds!"
       })
@@ -21,7 +21,7 @@ exports.createCourse = async (req, res) => {
     // fetching instructor details
     const instructorDetails = await User.findById(req.user.id)
     if (!instructorDetails) {
-      res.status(401).json({
+      res.status(400).json({
         success: false,
         message: "Cannot Fetch Instructor Details!"
       })
@@ -30,7 +30,7 @@ exports.createCourse = async (req, res) => {
     // fetching category details
     const categoryDetails = await Category.findById(category)
     if (!categoryDetails) {
-      res.status(401).json({
+      res.status(400).json({
         success: false,
         message: "Cannot Fetch category Details!"
       })
@@ -102,7 +102,7 @@ exports.getCourseDetails = async (req, res) => {
 
     // checking if course is present
     if (!courseDetails) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Course not found!"
       })
