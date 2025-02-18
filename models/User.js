@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema({
     ref: "Profile",
     required: true,
   },
+  cartItems: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
   courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
   courseProgress: [
     { type: mongoose.Schema.Types.ObjectId, ref: "CourseProgress" },

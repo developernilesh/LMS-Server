@@ -34,7 +34,7 @@ exports.createSubSection = async (req, res) => {
     }
 
     // creating entry in db for the new subsection
-    const newSubSection = await SubSection.create({ title, description, timeDuration, videoUrl: uploadedVideo.secure_url })
+    const newSubSection = await SubSection.create({ title, description, timeDuration, SubSectionVideo: uploadedVideo })
 
     // updating the corrrespponding section by adding the new sub-section
     await Section.findByIdAndUpdate(sectionId, { $push: { subSection: newSubSection._id } }, { new: true })
@@ -58,7 +58,7 @@ exports.updateSubSection = async (req, res) => {
     // fetching data from req
     const { title, timeDuration, description, subSectionId } = req.body
     const videoToUpload = req.files?.videoFile
-
+    
     // input validations
     if (!title || !timeDuration || !description || !subSectionId) {
       return res.status(400).json({
@@ -73,29 +73,51 @@ exports.updateSubSection = async (req, res) => {
       })
     }
 
-    // Check if a new video file is uploaded
+    // fetching the sub-section details
+    const subSectionDetails = await SubSection.findById(subSectionId)
+    if (!subSectionDetails) {
+      return res.status(400).json({
+        success: false,
+        message: "Sub Section not found",
+      })
+    }
+    
+    // updating the fields
     let updatedFields = { title, timeDuration, description }
     if (videoToUpload) {
-      // Upload new video to Cloudinary
-      const uploadedVideo = await uploadToCloudinary(videoToUpload, process.env.FOLDER_NAME)
-      if (!uploadedVideo) {
+      // Check if a new video file is uploaded
+      if (videoToUpload.md5 === subSectionDetails.SubSectionVideo.etag) {
         return res.status(400).json({
           success: false,
-          message: "Failed to upload the video. Please try again!",
+          message: "Video is same. Please upload a different video",
         })
+      } else {
+        // Upload new video to Cloudinary
+        const uploadedVideo = await uploadToCloudinary(videoToUpload, process.env.FOLDER_NAME)
+        if (!uploadedVideo) {
+          return res.status(400).json({
+            success: false,
+            message: "Failed to upload the video. Please try again!",
+          })
+        }
+        // Update SubSectionVideo in SubSection model
+        updatedFields.SubSectionVideo = uploadedVideo
       }
-      // Update videoUrl in SubSection model
-      updatedFields.videoUrl = uploadedVideo.secure_url
     }
 
     // Update the sub-section in db
     const updatedSubSection = await SubSection.findByIdAndUpdate(subSectionId, updatedFields, { new: true })
+    if (!updatedSubSection) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot update the sub-section at moment. Please try again!",
+      })
+    }
 
     // Success response
     res.status(200).json({
       success: true,
-      message: "Sub Section updated successfully!",
-      updatedSubSection,
+      message: "Sub Section updated successfully!"
     })
   } catch (error) {
     res.status(500).json({
@@ -106,7 +128,7 @@ exports.updateSubSection = async (req, res) => {
 }
 
 // deletion of a sub-section
-exports.deleteSubSection = async (req,res) => {
+exports.deleteSubSection = async (req, res) => {
   try {
     // fetching the sub-section id
     const { subSectionId } = req.body
