@@ -105,14 +105,14 @@ exports.getAverageRating = async (req, res) => {
       });
     }
 
-    // return response
+    // returning success response
     return res.status(200).json({
       success: true,
       message: "Average rating fetched successfully",
-      averageRating,
+      data: averageRating,
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: `Something went wrong: ${error.message}`
     })
@@ -138,7 +138,7 @@ exports.getAllRatingsAndReviews = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "All ratings and reviews fetched successfully",
-      allReviews,
+      data: allReviews,
     });
   } catch (error) {
     return res.status(500).json({
