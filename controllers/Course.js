@@ -35,7 +35,6 @@ exports.createCourse = async (req, res) => {
         message: "Cannot Fetch category Details!"
       })
     }
-    console.log("1")
     // uploading image to cludinary
     const thumbNail = await uploadToCloudinary(thumbnailImage, process.env.FOLDER_NAME)
 
@@ -44,16 +43,13 @@ exports.createCourse = async (req, res) => {
       courseName, courseDescription, instructor: instructorDetails._id, whatYouWillLearn, price,
       thumbNail: thumbNail.secure_url, category: categoryDetails._id, instructions, tags, status
     })
-    console.log("4")
 
     // updating instructor by adding course id in courses array of the instructor
     await User.findByIdAndUpdate(instructorDetails._id, { $push: { courses: newCourse._id } }, { new: true })
-    console.log("5")
 
     // updating instructor by adding course id in courses array of the instructor
     await Category.findByIdAndUpdate(categoryDetails._id, { $push: { courses: newCourse._id } }, { new: true })
-
-    console.log("6")
+    
     // success response
     res.status(200).json({
       success: true,

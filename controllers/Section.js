@@ -89,10 +89,8 @@ exports.deleteSection = async (req, res) => {
         message: "Unable to delete the section. Please try again!"
       })
     }
-    console.log("1", sectionId)
     // deletion of the section
     const section = await Section.findByIdAndDelete(sectionId);
-    console.log("2", section)
     // success response
     res.status(200).json({
       success: true,

@@ -48,7 +48,6 @@ exports.sendOTP = async (req, res) => {
         message: "Failed to send OTP"
       })
     }
-    console.log("generatedOTP : ", generatedOTP)
 
     // returning response
     res.status(200).json({

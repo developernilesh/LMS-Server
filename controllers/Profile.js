@@ -155,7 +155,6 @@ exports.getAllUserDetails = async (req, res) => {
 exports.updateDisplayPicture = async (req, res) => {
   try {
     // fetching the display picture
-    console.log(req.files.displayPicture);
     const displayPicture = req?.files?.displayPicture;
     const userId = req.user.id;
 
@@ -181,7 +180,6 @@ exports.updateDisplayPicture = async (req, res) => {
         message: "Cannot update display picture at moment. Please try again!",
       });
     }
-    console.log("userDetails : ", userDetails);
     // uploading the display picture to cloudinary
     const image = await uploadToCloudinary(
       displayPicture,
@@ -195,7 +193,6 @@ exports.updateDisplayPicture = async (req, res) => {
         message: "Cannot update display picture at moment. Please try again!",
       });
     }
-    console.log("image : ", image);
 
     // updating the user details
     const updatedProfile = await User.findByIdAndUpdate(
@@ -209,7 +206,7 @@ exports.updateDisplayPicture = async (req, res) => {
         message: "Cannot update display picture at moment. Please try again!",
       });
     }
-    console.log("updatedProfile : ", updatedProfile);
+    
     // success response
     res.status(200).json({
       success: true,
