@@ -101,7 +101,7 @@ exports.removeFromCart = async (req, res) => {
     if (!userDetails.cartItems.includes(courseId)) {
       return res.status(400).json({
         success: false,
-        message: "Course not found in cart!",
+        message: "There is no course in cart!",
       });
     }
 
@@ -143,7 +143,20 @@ exports.getCartItems = async (req, res) => {
 
     // fetching user details
     const userDetails = await User.findById(userId)
-      .populate("cartItems")
+      .populate({ 
+        path: "cartItems",
+        select: "courseName courseDescription price thumbNail whatYouWillLearn tags",
+        populate: [
+          {
+            path: "instructor",
+            select: "firstName lastName email image"
+          },
+          {
+            path: "ratingAndReview",
+            select: "rating review"
+          }
+        ]
+      })
       .exec();
     if (!userDetails) {
       return res.status(400).json({
@@ -186,6 +199,14 @@ exports.clearCart = async (req, res) => {
         success: false,
         message: "Cannot clear cart at moment. Please try again!",
       })
+    }
+
+    // checking is the cart empty
+    if (userDetails.cartItems.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "There is no course in cart!",
+      });
     }
 
     // clearing cart
