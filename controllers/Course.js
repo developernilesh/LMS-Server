@@ -9,6 +9,7 @@ exports.createCourse = async (req, res) => {
     // fetching data from req
     const { courseName, courseDescription, whatYouWillLearn, price, category, instructions, tags, status = "Draft" } = req.body
     const thumbnailImage = req.files.thumbnail
+    const instructorId = req.user.id
 
     // input validation
     if (!courseName || !courseDescription || !whatYouWillLearn || !price || !category || !thumbnailImage || !instructions || !tags) {
@@ -19,7 +20,7 @@ exports.createCourse = async (req, res) => {
     }
 
     // fetching instructor details
-    const instructorDetails = await User.findById(req.user.id)
+    const instructorDetails = await User.findById(instructorId)
     if (!instructorDetails) {
       res.status(400).json({
         success: false,

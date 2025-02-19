@@ -10,7 +10,7 @@ const { createSection, updateSection, deleteSection } = require("../controllers/
 const { createSubSection, updateSubSection, deleteSubSection } = require("../controllers/SubSection");
 const { createCategory, showAllCategories, categoryPageDetails } = require("../controllers/Category");
 const { createRatingAndReview, getAverageRating, getAllRatingsAndReviews } = require("../controllers/RatingAndReviews");
-const { addToCart, removeFromCart, getCartItems, clearCart } = require("../controllers/Cart");
+const { addToCart, removeFromCart, getCartItems, clearCart, enrollToCourse } = require("../controllers/Cart");
 
 // ******************************************************************************************************************
 //                                      Course routes
@@ -71,6 +71,9 @@ router.get("/get-cart-items", auth, isStudent, getCartItems);
 
 // clearing the cart
 router.post("/clear-cart", auth, isStudent, clearCart);
+
+// enrolling to a course
+router.post("/enroll-to-course", auth, isStudent, enrollToCourse);
 
 // ********************************************************************************************************
 //                                      Rating and Review

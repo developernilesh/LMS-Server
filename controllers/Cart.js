@@ -231,3 +231,83 @@ exports.clearCart = async (req, res) => {
     })
   }
 };
+
+// enrolling to a course
+exports.enrollToCourse = async (req, res) => {
+  try {
+    const { courseId } = req.body;
+    const userId = req.user.id;
+
+    // validations
+    if (!courseId || !userId) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot enroll in course at moment. Please try again!",
+      })
+    }
+
+    // fetching course details
+    const courseDetails = await Course.findById(courseId);
+    if (!courseDetails) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot enroll in course at moment. Please try again!",
+      })
+    }
+
+    // fetching user details
+    const userDetails = await User.findById(userId);
+    if (!userDetails) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot enroll in course at moment. Please try again!",
+      })
+    }
+
+    // checking if the course is already enrolled
+    if (userDetails.courses.includes(courseId) && courseDetails.studentsEnrolled.includes(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Already enrolled in this course!",
+      })
+    }
+
+    // enrolling to the course
+    userDetails.courses.push(courseId);
+    const updatedUser = await userDetails.save();
+    if (!updatedUser) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot enroll in course at moment. Please try again!",
+      })
+    } 
+
+    // updating course details
+    courseDetails.studentsEnrolled.push(userId);
+    const updatedCourse = await courseDetails.save();
+    if (!updatedCourse) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot enroll in course at moment. Please try again!",
+      })
+    }
+
+    // if the course is present in the cart, remove it from the cart
+    if (userDetails.cartItems.includes(courseId)) {
+      userDetails.cartItems = userDetails.cartItems.filter((item) => item.toString() !== courseId);
+      await userDetails.save();
+    }
+
+    // returning success response
+    return res.status(200).json({
+      success: true,
+      message: "Successfully enrolled in the course!",
+    });     
+  } catch (error) { 
+    return res.status(500).json({
+      success: false,
+      message: `Something went wrong: ${error.message}`
+    })
+  }
+}
+

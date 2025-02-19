@@ -29,7 +29,6 @@ exports.createRatingAndReview = async (req, res) => {
       user: userId,
       course: courseId,
     });
-
     if (alreadyReviewed) {
       return res.status(400).json({
         success: false,
@@ -44,17 +43,16 @@ exports.createRatingAndReview = async (req, res) => {
       rating,
       review,
     });
+    if (!ratingAndReview) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot create rating and review",
+      });
+    }
 
     // update course details
-    const updatedCourseDetails = await Course.findByIdAndUpdate(
-      courseId,
-      {
-        $push: {
-          ratingAndReviews: ratingAndReview._id,
-        },
-      },
-      { new: true }
-    );
+    courseDetails.ratingAndReview.push(ratingAndReview._id);
+    const updatedCourseDetails = await courseDetails.save()
     if (!updatedCourseDetails) {
       return res.status(400).json({
         success: false,
@@ -65,9 +63,7 @@ exports.createRatingAndReview = async (req, res) => {
     // return response
     return res.status(200).json({
       success: true,
-      message: "Rating and review created successfully",
-      ratingAndReview,
-      updatedCourseDetails,
+      message: "Rating and review created successfully"
     });
   } catch (error) {
     return res.status(500).json({
