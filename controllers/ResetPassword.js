@@ -2,6 +2,7 @@ const User = require("../models/User");
 const mailSender = require("../utils/MailSender");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
+require("dotenv").config()
 
 // generate token
 exports.resetPasswordToken = async (req, res) => {
@@ -41,7 +42,7 @@ exports.resetPasswordToken = async (req, res) => {
     }
 
     // creating the unique url
-    const url = `http://localhost:3000/update-password/${token}`
+    const url = `${process.env.FRONTEND_URL}/update-password/${token}`
 
     // sending mail containing the url
     await mailSender(email, "Password reset link", `Password reset link : ${url}`);
@@ -49,7 +50,8 @@ exports.resetPasswordToken = async (req, res) => {
     // returning response
     res.status(200).json({
       success: true,
-      message: "Email sent successfully. Please check email and change password."
+      message: "Email sent successfully. Please check email and change password.",
+      url
     })
   } catch (error) {
     res.status(500).json({
