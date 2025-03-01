@@ -106,6 +106,14 @@ exports.resetPassword = async (req, res) => {
       });
     }
 
+    const isPasswordSameToOldPassword = await bcrypt.compare(resetPassword, user.password);
+    if (isPasswordSameToOldPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'This password already exists in old password. Please enter a new password!'
+      });
+    }
+
     // hashing the password
     const hashedResetPassword = await bcrypt.hash(resetPassword, 10)
     if (!hashedResetPassword) {
