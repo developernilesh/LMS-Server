@@ -162,7 +162,7 @@ exports.updateDisplayPicture = async (req, res) => {
     if (!displayPicture) {
       return res.status(400).json({
         success: false,
-        message: "Please upload a display picture!",
+        message: "Please select a picture!",
       });
     }
     if (!userId) {
