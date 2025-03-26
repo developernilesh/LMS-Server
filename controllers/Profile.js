@@ -6,11 +6,11 @@ require("dotenv").config();
 exports.updateProfile = async (req, res) => {
   try {
     // fetching data from req body
-    const { contact, gender, dateOfBirth = "", about = "" } = req.body;
+    const { firstName, lastName, contact, gender, dateOfBirth = "", about = "" } = req.body;
     const userId = req.user.id;
 
     // input validations
-    if (!contact || !gender) {
+    if (!firstName || !lastName) {
       return res.status(400).json({
         success: false,
         message: "Please fill the required fields!",
@@ -31,6 +31,9 @@ exports.updateProfile = async (req, res) => {
         message: "User not found. Please try again!",
       });
     }
+    userDetails.firstName = firstName
+    userDetails.lastName = lastName
+    await userDetails.save()
 
     // fetching profile id from user details
     const profileId = userDetails?.additionalDetails;
@@ -61,6 +64,7 @@ exports.updateProfile = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Profile updated sucessfully",
+      userDetails, profileDetails
     });
   } catch (error) {
     res.status(500).json({
@@ -170,7 +174,7 @@ exports.updateDisplayPicture = async (req, res) => {
         success: false,
         message: "Cannot update display picture at moment. Please try again!",
       });
-    } 
+    }
 
     // fetching the user details
     const userDetails = await User.findById(userId);
@@ -206,7 +210,7 @@ exports.updateDisplayPicture = async (req, res) => {
         message: "Cannot update display picture at moment. Please try again!",
       });
     }
-    
+
     // success response
     res.status(200).json({
       success: true,
@@ -252,7 +256,7 @@ exports.getEnrolledCourses = async (req, res) => {
       message: "Enrolled courses fetched successfully",
       data: userDetails.courses,
     });
-  } catch (error) {   
+  } catch (error) {
     res.status(500).json({
       success: false,
       message: `Something went wrong: ${error.message}`
