@@ -33,6 +33,9 @@ exports.updateProfile = async (req, res) => {
     }
     userDetails.firstName = firstName
     userDetails.lastName = lastName
+    if(userDetails.image?.split('/')[2] === 'api.dicebear.com'){
+      userDetails.image = `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`
+    }
     await userDetails.save()
 
     // fetching profile id from user details
