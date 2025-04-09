@@ -217,7 +217,6 @@ exports.login = async (req, res) => {
       .status(200)
       .json({
         success: true,
-        token,
         tokenExpiresIn: Date.now() + 3 * 24 * 60 * 60 * 1000,
         user,
         message: "User logged in successfully",
