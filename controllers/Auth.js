@@ -1,20 +1,20 @@
 const User = require("../models/User");
 const OTP = require("../models/OTP");
-const Profile = require("../models/Profile")
-const otpGenerator = require('otp-generator')
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
+const Profile = require("../models/Profile");
+const otpGenerator = require("otp-generator");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const mailSender = require("../utils/MailSender")
-const passwordUpdated = require("../mail/templates/passwordUpdate")
+const mailSender = require("../utils/MailSender");
+const passwordUpdated = require("../mail/templates/passwordUpdate");
 
 const generateOTP = () => {
   return otpGenerator.generate(6, {
     upperCaseAlphabets: false,
     lowerCaseAlphabets: false,
-    specialChars: false
-  })
-}
+    specialChars: false,
+  });
+};
 
 // send OTP
 exports.sendOTP = async (req, res) => {
@@ -33,33 +33,33 @@ exports.sendOTP = async (req, res) => {
 
     // generating a unique otp
     let otp = generateOTP();
-    let alreadyExistingOtp = await OTP.findOne({ otp: otp })
+    let alreadyExistingOtp = await OTP.findOne({ otp: otp });
     while (alreadyExistingOtp) {
       otp = generateOTP();
-      alreadyExistingOtp = await OTP.findOne({ otp: otp })
+      alreadyExistingOtp = await OTP.findOne({ otp: otp });
     }
 
     // create an entry in DB for OTP
-    const otpPayload = { email, otp }
-    const generatedOTP = await OTP.create(otpPayload)
+    const otpPayload = { email, otp };
+    const generatedOTP = await OTP.create(otpPayload);
     if (!generatedOTP) {
       return res.status(400).json({
         success: false,
-        message: "Failed to send OTP"
-      })
+        message: "Failed to send OTP",
+      });
     }
 
     // returning response
     res.status(200).json({
       success: true,
       message: "Otp sent successfully",
-      otp
-    })
+      otp,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
-    })
+      message: error.message,
+    });
   }
 };
 
@@ -67,22 +67,39 @@ exports.sendOTP = async (req, res) => {
 exports.signUp = async (req, res) => {
   try {
     // fetching data from request's body
-    const { firstName, lastName, email, password, confirmPassword, accountType, otp } = req.body
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      confirmPassword,
+      accountType,
+      otp,
+    } = req.body;
 
     // validations for input fields
-    if (!firstName || !lastName || !email || !password || !confirmPassword || !accountType || !otp) {
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      !password ||
+      !confirmPassword ||
+      !accountType ||
+      !otp
+    ) {
       return res.status(400).json({
         success: false,
-        message: "Please fill all the required fileds"
-      })
+        message: "Please fill all the required fileds",
+      });
     }
 
     // checking if confirm password matches original passowrd
     if (password !== confirmPassword) {
       return res.status(400).json({
         success: false,
-        message: "Confirm password doesn't match the original passowrd. Please try again!"
-      })
+        message:
+          "Confirm password doesn't match the original passowrd. Please try again!",
+      });
     }
 
     // checking if user already exists
@@ -95,7 +112,9 @@ exports.signUp = async (req, res) => {
     }
 
     // finding most recent otp for the user
-    const recentOTP = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1)
+    const recentOTP = await OTP.find({ email })
+      .sort({ createdAt: -1 })
+      .limit(1);
 
     // validation for the otp
     if (!recentOTP.length || otp !== recentOTP[0].otp) {
@@ -106,55 +125,60 @@ exports.signUp = async (req, res) => {
     }
 
     // passowrd hashing
-    const hashedPassword = await bcrypt.hash(password, 10)
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // creating entry in DB
     const profileDetails = await Profile.create({
       gender: null,
       dateOfBirth: null,
       about: null,
-    })
+    });
 
     const userDetails = await User.create({
-      firstName, lastName, email, password: hashedPassword, accountType, additionalDetails: profileDetails._id,
-      image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`
-    })
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+      accountType,
+      additionalDetails: profileDetails._id,
+      image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
+    });
 
     // sending response
     res.status(200).json({
       success: true,
       message: "User Registered Successfully",
-      userDetails
-    })
+      userDetails,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
-    })
+      message: error.message,
+    });
   }
-}
+};
 
 // Login
 exports.login = async (req, res) => {
   try {
     // fetching data from request's body
-    const { email, password } = req.body
+    const { email, password } = req.body;
 
     // validation for the inputs
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Please fill all the required fileds"
-      })
+        message: "Please fill all the required fileds",
+      });
     }
 
     // cheching if user exists
-    let user = await User.findOne({ email })
+    let user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({
         success: false,
-        message: "User is not registered"
-      })
+        message: "User is not registered",
+      });
     }
 
     // verifying the entered password
@@ -162,7 +186,7 @@ exports.login = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(400).json({
         success: false,
-        message: 'Incorrect Password'
+        message: "Incorrect Password",
       });
     }
 
@@ -171,13 +195,14 @@ exports.login = async (req, res) => {
       email: user.email,
       id: user._id,
       accountType: user.accountType,
-    }
-    let token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '72h' })
+    };
+    let token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "72h" });
+    console.log(token);
     if (!token) {
       return res.status(400).json({
         success: false,
-        message: "Cannot login! Please try again."
-      })
+        message: "Cannot login! Please try again.",
+      });
     }
     user["token"] = token;
     user["password"] = undefined;
@@ -186,20 +211,24 @@ exports.login = async (req, res) => {
     const options = {
       expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
       httpOnly: true,
-    }
-    res.cookie("token", token, options).status(200).json({
-      success: true,
-      token,
-      user,
-      message: 'User logged in successfully'
-    })
+    };
+    res
+      .cookie("token", token, options)
+      .status(200)
+      .json({
+        success: true,
+        token,
+        tokenExpiresIn: Date.now() + 3 * 24 * 60 * 60 * 1000,
+        user,
+        message: "User logged in successfully",
+      });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: error.message
-    })
+      message: error.message,
+    });
   }
-}
+};
 
 // logout
 exports.logout = async (req, res) => {
@@ -210,73 +239,78 @@ exports.logout = async (req, res) => {
     // returning response
     res.status(200).json({
       success: true,
-      message: "User logged out successfully"
-    })
+      message: "User logged out successfully",
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: `Something went wrong: ${error.message}`
-    })
+      message: `Something went wrong: ${error.message}`,
+    });
   }
-}
+};
 
 // Change Passowrd
 exports.changePassword = async (req, res) => {
   try {
     // fetching data from req body
-    const { email, oldPassword, newPassword, confirmNewPassword } = req.body
+    const { email, oldPassword, newPassword, confirmNewPassword } = req.body;
 
     // validations for input fileds
     if (!oldPassword || !newPassword || !confirmNewPassword) {
       return res.status(400).json({
         success: false,
-        message: "Please fill all the required fileds"
-      })
+        message: "Please fill all the required fileds",
+      });
     }
 
     // other validations
     if (newPassword !== confirmNewPassword) {
       return res.status(400).json({
         success: false,
-        message: "Confirm password doesn't match the original passowrd. Please try again!"
-      })
+        message:
+          "Confirm password doesn't match the original passowrd. Please try again!",
+      });
     }
 
-    let user = await User.findOne({ email })
+    let user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({
         success: false,
-        message: "Cannot change password! Please try again."
-      })
+        message: "Cannot change password! Please try again.",
+      });
     }
 
     // checking if the entered old password is wrong
-    if (!await bcrypt.compare(oldPassword, user.password)) {
+    if (!(await bcrypt.compare(oldPassword, user.password))) {
       return res.status(400).json({
         success: false,
-        message: "You have enterd wrong old passowrd"
-      })
+        message: "You have enterd wrong old passowrd",
+      });
     }
 
     // checking if new password is same as old password
     if (newPassword === oldPassword) {
       return res.status(400).json({
         success: false,
-        message: "New password cannot be same as old password"
-      })
+        message: "New password cannot be same as old password",
+      });
     }
 
     // updating passowrd in database
-    const hashedNewPassword = await bcrypt.hash(newPassword, 10)
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
     if (!hashedNewPassword) {
       return res.status(400).json({
         success: false,
         message: "Failed to update the new password. Please try again.",
       });
     }
-    user["password"] = hashedNewPassword
+    user["password"] = hashedNewPassword;
 
-    const updatedUser = await User.findByIdAndUpdate(user._id, { ...user }, { new: true })
+    const updatedUser = await User.findByIdAndUpdate(
+      user._id,
+      { ...user },
+      { new: true }
+    );
     if (!updatedUser) {
       return res.status(500).json({
         success: false,
@@ -292,17 +326,17 @@ exports.changePassword = async (req, res) => {
         updatedUser.email,
         `Password updated successfully for ${updatedUser.firstName} ${updatedUser.lastName}`
       )
-    )
+    );
 
     // returning response
     res.status(200).json({
       success: true,
-      message: "Password updated successfully!"
-    })
+      message: "Password updated successfully!",
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
-    })
+      message: error.message,
+    });
   }
-}
+};
