@@ -41,20 +41,20 @@ exports.createCourse = async (req, res) => {
 
     // creating course entry in db
     const newCourse = await Course.create({
-      courseName, courseDescription, instructor: instructorDetails._id, whatYouWillLearn, price,
-      thumbNail: thumbNail.secure_url, category: categoryDetails._id, instructions, tags, status
+      courseName, courseDescription, instructor: instructorDetails._id, whatYouWillLearn, price, thumbNail: thumbNail.secure_url, 
+      category: categoryDetails._id, instructions: JSON.parse(instructions), tags: JSON.parse(tags), status
     })
 
     // updating instructor by adding course id in courses array of the instructor
     await User.findByIdAndUpdate(instructorDetails._id, { $push: { courses: newCourse._id } }, { new: true })
 
-    // updating instructor by adding course id in courses array of the instructor
+    // updating instructor by adding course id in courses array of the category
     await Category.findByIdAndUpdate(categoryDetails._id, { $push: { courses: newCourse._id } }, { new: true })
     
     // success response
     res.status(200).json({
       success: true,
-      message: "Course Created Successfully!",
+      message: "Course Initiated Successfully!",
       courseInfo: newCourse
     })
   } catch (error) {
@@ -69,7 +69,7 @@ exports.createCourse = async (req, res) => {
 exports.showAllCourses = async (req, res) => {
   try {
     const allCourses = await Course.find({},
-      { courseName: true, price: true, thumbNail: true, instructor: true, ratingAndReview: true, studentsEnrolled: true }
+      { courseName: true, courseDescription: true, price: true, thumbNail: true, instructor: true, ratingAndReview: true, studentsEnrolled: true }
     ).populate({ path: "instructor", select: "firstName lastName email image", populate: { path: "additionalDetails" } })
       .exec()
 
