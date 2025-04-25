@@ -17,7 +17,7 @@ exports.createSection = async (req, res) => {
     if (!courseId) {
       return res.status(400).json({
         success: false,
-        message: "Unable to update section. Please try again!"
+        message: "Unable to create section. Please try again!"
       })
     }
 
