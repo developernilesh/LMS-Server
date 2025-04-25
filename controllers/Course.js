@@ -89,11 +89,10 @@ exports.showAllCourses = async (req, res) => {
 // getting particular course details
 exports.getCourseDetails = async (req, res) => {
   try {
-    const { courseId } = req.body
+    const { courseId } = req.params
     const courseDetails = await Course.findById(courseId)
       .populate({ path: "instructor", select: "firstName lastName email image", populate: { path: "additionalDetails" } })
       .populate({ path: "courseContent", populate: { path: "subSection" } })
-      .populate("category")
       .populate("ratingAndReview")
       .exec()
 
