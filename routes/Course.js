@@ -41,7 +41,7 @@ router.delete("/delete-sub-section", auth, isInstructor, deleteSubSection);
 router.get("/get-all-courses", showAllCourses);
 
 // getting Details for a Specific Courses
-router.get("/get-courses-details", getCourseDetails);
+router.get("/get-courses-details/:courseId", getCourseDetails);
 
 // ******************************************************************************************************************
 //                                      Category routes (only for Admin)
