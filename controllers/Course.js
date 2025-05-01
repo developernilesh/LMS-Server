@@ -13,7 +13,7 @@ exports.createCourse = async (req, res) => {
 
     // input validation
     if (!courseName || !courseDescription || !whatYouWillLearn || !price || !category || !thumbnailImage || !instructions || !tags) {
-      res.status(400).json({
+      return res.status(400).json({
         success: false,
         message: "Please fill all the required fileds!"
       })
@@ -22,7 +22,7 @@ exports.createCourse = async (req, res) => {
     // fetching instructor details
     const instructorDetails = await User.findById(instructorId)
     if (!instructorDetails) {
-      res.status(400).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot Fetch Instructor Details!"
       })
@@ -31,7 +31,7 @@ exports.createCourse = async (req, res) => {
     // fetching category details
     const categoryDetails = await Category.findById(category)
     if (!categoryDetails) {
-      res.status(400).json({
+      return res.status(400).json({
         success: false,
         message: "Cannot Fetch category Details!"
       })
@@ -64,6 +64,34 @@ exports.createCourse = async (req, res) => {
     })
   }
 };
+
+// Publishing Course
+exports.publishCourse = async (req,res) => {
+  try {
+    const {courseId,status} = req.body
+
+    if(!courseId || !status || status !== 'Published'){
+      return res.status(400).json({
+        success: false,
+        message: "Cannot Publish Course At Moment!"
+      })
+    }
+
+    const courseDetails = await Course.findById(courseId)
+    courseDetails.status = status
+    await courseDetails.save()
+
+    res.status(200).json({
+      success: true,
+      message: "Course Published Successfully!",
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+}
 
 // fetching all courses
 exports.showAllCourses = async (req, res) => {
