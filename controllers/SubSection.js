@@ -7,11 +7,11 @@ require("dotenv").config();
 exports.createSubSection = async (req, res) => {
   try {
     // fetching data from req
-    const { title, timeDuration, description, sectionId } = req.body
+    const { title, timeDuration = null, description, sectionId } = req.body
     const videoToUpload = req.files.videoFile
 
     // input validations
-    if (!title || !timeDuration || !description || !videoToUpload) {
+    if (!title || !description || !videoToUpload) {
       return res.status(400).json({
         success: false,
         message: "Please fill all the required fields",
@@ -56,11 +56,11 @@ exports.createSubSection = async (req, res) => {
 exports.updateSubSection = async (req, res) => {
   try {
     // fetching data from req
-    const { title, timeDuration, description, subSectionId } = req.body
+    const { title, timeDuration = null, description, subSectionId } = req.body
     const videoToUpload = req.files?.videoFile
     
     // input validations
-    if (!title || !timeDuration || !description || !subSectionId) {
+    if (!title || !description || !subSectionId) {
       return res.status(400).json({
         success: false,
         message: "Please fill all the required fields",
