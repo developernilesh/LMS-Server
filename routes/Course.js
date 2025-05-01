@@ -5,7 +5,7 @@ const router = express.Router();
 const { auth, isStudent, isInstructor, isAdmin } = require("../middlewares/auth");
 
 // importing controllers
-const { createCourse, getCourseDetails, showAllCourses } = require("../controllers/Course");
+const { createCourse, getCourseDetails, showAllCourses, publishCourse } = require("../controllers/Course");
 const { createSection, updateSection, deleteSection } = require("../controllers/Section");
 const { createSubSection, updateSubSection, deleteSubSection } = require("../controllers/SubSection");
 const { createCategory, showAllCategories, categoryPageDetails } = require("../controllers/Category");
@@ -18,6 +18,9 @@ const { addToCart, removeFromCart, getCartItems, clearCart, enrollToCourse } = r
 
 // Courses can Only be Created by Instructors
 router.post("/create-course", auth, isInstructor, createCourse);
+
+// Publishing a course
+router.post("publish-course",publishCourse)
 
 // Adding a section to a course
 router.post("/add-section", auth, isInstructor, createSection);
