@@ -197,7 +197,6 @@ exports.login = async (req, res) => {
       accountType: user.accountType,
     };
     let token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "72h" });
-    console.log(token);
     if (!token) {
       return res.status(400).json({
         success: false,
