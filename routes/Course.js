@@ -2,15 +2,48 @@ const express = require("express");
 const router = express.Router();
 
 // importing middleware
-const { auth, isStudent, isInstructor, isAdmin } = require("../middlewares/auth");
+const {
+  auth,
+  isStudent,
+  isInstructor,
+  isAdmin,
+} = require("../middlewares/auth");
 
 // importing controllers
-const { createCourse, getCourseDetails, showAllCourses, publishCourse } = require("../controllers/Course");
-const { createSection, updateSection, deleteSection } = require("../controllers/Section");
-const { createSubSection, updateSubSection, deleteSubSection } = require("../controllers/SubSection");
-const { createCategory, showAllCategories, categoryPageDetails } = require("../controllers/Category");
-const { createRatingAndReview, getAverageRating, getAllRatingsAndReviews } = require("../controllers/RatingAndReviews");
-const { addToCart, removeFromCart, getCartItems, clearCart, enrollToCourse } = require("../controllers/Cart");
+const {
+  createCourse,
+  getCourseDetails,
+  showAllCourses,
+  publishCourse,
+  editCourse,
+} = require("../controllers/Course");
+const {
+  createSection,
+  updateSection,
+  deleteSection,
+} = require("../controllers/Section");
+const {
+  createSubSection,
+  updateSubSection,
+  deleteSubSection,
+} = require("../controllers/SubSection");
+const {
+  createCategory,
+  showAllCategories,
+  categoryPageDetails,
+} = require("../controllers/Category");
+const {
+  createRatingAndReview,
+  getAverageRating,
+  getAllRatingsAndReviews,
+} = require("../controllers/RatingAndReviews");
+const {
+  addToCart,
+  removeFromCart,
+  getCartItems,
+  clearCart,
+  enrollToCourse,
+} = require("../controllers/Cart");
 
 // ******************************************************************************************************************
 //                                      Course routes
@@ -19,8 +52,11 @@ const { addToCart, removeFromCart, getCartItems, clearCart, enrollToCourse } = r
 // Courses can Only be Created by Instructors
 router.post("/create-course", auth, isInstructor, createCourse);
 
+// Editting Course
+router.put("/edit-course", auth, isInstructor, editCourse);
+
 // Publishing a course
-router.post("publish-course",publishCourse)
+router.post("/publish-course", auth, isInstructor, publishCourse);
 
 // Adding a section to a course
 router.post("/add-section", auth, isInstructor, createSection);
