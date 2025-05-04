@@ -41,7 +41,7 @@ exports.createCourse = async (req, res) => {
 
     // creating course entry in db
     const newCourse = await Course.create({
-      courseName, courseDescription, instructor: instructorDetails._id, whatYouWillLearn, price, thumbNail: thumbNail.secure_url, 
+      courseName, courseDescription, instructor: instructorDetails._id, whatYouWillLearn, price, thumbNail: thumbNail, 
       category: categoryDetails._id, instructions: JSON.parse(instructions), tags: JSON.parse(tags), status
     })
 
@@ -65,21 +65,26 @@ exports.createCourse = async (req, res) => {
   }
 };
 
+// Editing a course
 exports.editCourse = async (req, res) => {
   try {
     // fetching data from req
     const { courseName, courseDescription, whatYouWillLearn, price, category, instructions, tags, courseId } = req.body
     const thumbnailImage = req.files?.thumbnail
-    console.log("req-body",req.body)
 
     // input validation
-    if (!courseName || !courseDescription || !whatYouWillLearn || !price || !category || !instructions || !tags || !courseId) {
+    if (!courseName || !courseDescription || !whatYouWillLearn || !price || !category || !instructions || !tags) {
       return res.status(400).json({
         success: false,
         message: "Please fill all the required fileds!"
       })
     }
-
+    if (!courseId) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot edit course at moment. Please try again!",
+      })
+    }
     // fetching instructor details
     const courseDetails = await Course.findById(courseId)
     if (!courseDetails) {
@@ -89,14 +94,30 @@ exports.editCourse = async (req, res) => {
       })
     }
     
-    // uploading image to cludinary
-    // const thumbNail = await uploadToCloudinary(thumbnailImage, process.env.FOLDER_NAME)
+    // updating the fields
+    let updatedFields = { courseName, courseDescription, whatYouWillLearn, price, category, 
+      instructions: JSON.parse(instructions), tags: JSON.parse(tags) }
+    
+    // uploading image to cloudinary
+    if(thumbnailImage){
+      const thumbNailImg = await uploadToCloudinary(thumbnailImage, process.env.FOLDER_NAME)
+      updatedFields.thumbNail = thumbNailImg
+    }
+
+    // Update the sub-section in db
+    const updatedCourse = await Course.findByIdAndUpdate(courseId, updatedFields, { new: true })
+    if (!updatedCourse) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot update the sub-section at moment. Please try again!",
+      })
+    }
 
     // success response
     res.status(200).json({
       success: true,
-      message: "Course Initiated Successfully!",
-      courseInfo: courseDetails
+      message: "Course Informations Updated Successfully!",
+      courseInfo: updatedCourse
     })
   } catch (error) {
     res.status(500).json({
