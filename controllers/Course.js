@@ -65,6 +65,47 @@ exports.createCourse = async (req, res) => {
   }
 };
 
+exports.editCourse = async (req, res) => {
+  try {
+    // fetching data from req
+    const { courseName, courseDescription, whatYouWillLearn, price, category, instructions, tags, courseId } = req.body
+    const thumbnailImage = req.files?.thumbnail
+    console.log("req-body",req.body)
+
+    // input validation
+    if (!courseName || !courseDescription || !whatYouWillLearn || !price || !category || !instructions || !tags || !courseId) {
+      return res.status(400).json({
+        success: false,
+        message: "Please fill all the required fileds!"
+      })
+    }
+
+    // fetching instructor details
+    const courseDetails = await Course.findById(courseId)
+    if (!courseDetails) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot Fetch Instructor Details!"
+      })
+    }
+    
+    // uploading image to cludinary
+    // const thumbNail = await uploadToCloudinary(thumbnailImage, process.env.FOLDER_NAME)
+
+    // success response
+    res.status(200).json({
+      success: true,
+      message: "Course Initiated Successfully!",
+      courseInfo: courseDetails
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+};
+
 // Publishing Course
 exports.publishCourse = async (req,res) => {
   try {
