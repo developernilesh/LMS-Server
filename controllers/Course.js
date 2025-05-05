@@ -71,7 +71,7 @@ exports.editCourse = async (req, res) => {
     // fetching data from req
     const { courseName, courseDescription, whatYouWillLearn, price, category, instructions, tags, courseId } = req.body
     const thumbnailImage = req.files?.thumbnail
-
+    console.log(req.files)
     // input validation
     if (!courseName || !courseDescription || !whatYouWillLearn || !price || !category || !instructions || !tags) {
       return res.status(400).json({
@@ -99,9 +99,25 @@ exports.editCourse = async (req, res) => {
       instructions: JSON.parse(instructions), tags: JSON.parse(tags) }
     
     // uploading image to cloudinary
-    if(thumbnailImage){
-      const thumbNailImg = await uploadToCloudinary(thumbnailImage, process.env.FOLDER_NAME)
-      updatedFields.thumbNail = thumbNailImg
+    if (thumbnailImage) {
+      // Check if a new image file is uploaded
+      if (thumbnailImage.md5 === courseDetails.thumbNail.etag) {
+        return res.status(400).json({
+          success: false,
+          message: "Thumbnail Image is same as previous. Please upload a different image",
+        });
+      } else {
+        // Upload new image to Cloudinary
+        const thumbNailImg = await uploadToCloudinary(thumbnailImage, process.env.FOLDER_NAME)
+        if (!thumbNailImg) {
+          return res.status(400).json({
+            success: false,
+            message: "Failed to upload the image. Please try again!",
+          });
+        }
+        // Update thumbnail in SubSection model
+        updatedFields.thumbNail = thumbNailImg
+      }
     }
 
     // Update the sub-section in db
@@ -154,6 +170,50 @@ exports.publishCourse = async (req,res) => {
     })
   }
 }
+
+exports.deleteCourse = async (req, res) => {
+  try {
+    const { courseId } = req.body;
+
+    // Validate courseId
+    if (!courseId) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot delete the course at moment.",
+      });
+    }
+
+    // Find the course
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: "Course not found.",
+      });
+    }
+
+    // Remove course from instructor's courses array
+    await User.findByIdAndUpdate(course.instructor, { $pull: { courses: courseId } });
+
+    // Remove course from category's courses array
+    if (course.category) {
+      await Category.findByIdAndUpdate(course.category, { $pull: { courses: courseId } });
+    }
+
+    // Delete the course
+    await Course.findByIdAndDelete(courseId);
+
+    res.status(200).json({
+      success: true,
+      message: "Course deleted successfully.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: `Something went wrong: ${error.message}`,
+    });
+  }
+};
 
 // fetching all courses
 exports.showAllCourses = async (req, res) => {
