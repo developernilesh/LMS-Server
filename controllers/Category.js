@@ -33,8 +33,8 @@ exports.createCategory = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: `Something went wrong: ${error.message}`
-    })
+      message: `Something went wrong: ${error.message}`,
+    });
   }
 };
 
@@ -53,15 +53,15 @@ exports.showAllCategories = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: `Something went wrong: ${error.message}`
-    })
+      message: `Something went wrong: ${error.message}`,
+    });
   }
 };
 
 // category page details
 exports.categoryPageDetails = async (req, res) => {
   try {
-    const { categoryId } = req.body;
+    const { categoryId } = req.params;
 
     // getting details of category
     const categoryDetails = await Category.findById(categoryId)
@@ -102,7 +102,7 @@ exports.categoryPageDetails = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: `Something went wrong: ${error.message}`
-    })
+      message: `Something went wrong: ${error.message}`,
+    });
   }
 };
