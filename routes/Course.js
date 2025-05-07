@@ -16,6 +16,7 @@ const {
   showAllCourses,
   publishCourse,
   editCourse,
+  deleteCourse,
 } = require("../controllers/Course");
 const {
   createSection,
@@ -55,6 +56,9 @@ router.post("/create-course", auth, isInstructor, createCourse);
 // Editting Course
 router.put("/edit-course", auth, isInstructor, editCourse);
 
+// Deleting Course
+router.delete("/delete-course", auth, isInstructor, deleteCourse);
+
 // Publishing a course
 router.post("/publish-course", auth, isInstructor, publishCourse);
 
@@ -93,7 +97,7 @@ router.post("/create-category", auth, isAdmin, createCategory);
 router.get("/get-all-categories", showAllCategories);
 
 // getting category page details
-router.get("/get-category-page-details", categoryPageDetails);
+router.get("/get-category-page-details/:categoryId", categoryPageDetails);
 
 // ******************************************************************************************************************
 //                                      Cart routes (only for Student)
