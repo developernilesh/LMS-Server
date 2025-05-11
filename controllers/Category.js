@@ -66,6 +66,7 @@ exports.categoryPageDetails = async (req, res) => {
     // getting details of category
     const categoryDetails = await Category.findById(categoryId)
       .populate("courses")
+      .populate({ path: "courses", populate: { path: "ratingAndReview" } })
       .exec();
 
     if (!categoryDetails) {
