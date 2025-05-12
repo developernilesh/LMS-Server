@@ -65,7 +65,6 @@ exports.categoryPageDetails = async (req, res) => {
 
     // getting details of category
     const categoryDetails = await Category.findById(categoryId)
-      .populate("courses")
       .populate({ path: "courses", populate: { path: "ratingAndReview" } })
       .exec();
 
@@ -80,7 +79,7 @@ exports.categoryPageDetails = async (req, res) => {
     const differentCategories = await Category.find({
       _id: { $ne: categoryId },
     })
-      .populate("courses")
+      .populate({ path: "courses", populate: { path: "ratingAndReview" } })
       .exec();
 
     // getting top selling courses
