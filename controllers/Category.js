@@ -75,17 +75,25 @@ exports.categoryPageDetails = async (req, res) => {
       });
     }
 
-    // getting courses for different categories
+    // getting most popular courses in the paricular category
+    const mostPopular = await Category.findById(categoryId)
+      .populate({ path: "courses", populate: { path: "ratingAndReview" } })
+      .sort({ studentsEnrolled: -1 })
+      .limit(10)
+      .exec();
+
+    // getting top selling courses for different categories
     const differentCategories = await Category.find({
       _id: { $ne: categoryId },
     })
       .populate({ path: "courses", populate: { path: "ratingAndReview" } })
+      .sort({ studentsEnrolled: -1 })
+      .limit(20)
       .exec();
 
-    // getting top selling courses
+    // top selling courses (of all categories)
     const topSellingCourses = await Course.find({})
       .sort({ studentsEnrolled: -1 })
-      .limit(10)
       .populate("ratingAndReview")
       .exec();
 
@@ -95,6 +103,7 @@ exports.categoryPageDetails = async (req, res) => {
       message: "Category details fetched successfully",
       data: {
         categoryDetails,
+        mostPopular,
         differentCategories,
         topSellingCourses,
       },
