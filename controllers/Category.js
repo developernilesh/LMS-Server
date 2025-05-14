@@ -83,12 +83,11 @@ exports.categoryPageDetails = async (req, res) => {
       .exec();
 
     // getting top selling courses for different categories
-    const differentCategories = await Category.find({
-      _id: { $ne: categoryId },
+    const differentCategories = await Course.find({
+      category: { $ne: categoryId },
     })
-      .populate({ path: "courses", populate: { path: "ratingAndReview" } })
       .sort({ studentsEnrolled: -1 })
-      .limit(20)
+      .populate("ratingAndReview")
       .exec();
 
     // top selling courses (of all categories)
