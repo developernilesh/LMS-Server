@@ -42,7 +42,7 @@ exports.createSubSection = async (req, res) => {
     // success reponse
     res.status(200).json({
       success: true,
-      message: "Sub Section created successfully!",
+      message: "Lecture added successfully!",
     })
   } catch (error) {
     res.status(500).json({
@@ -117,7 +117,7 @@ exports.updateSubSection = async (req, res) => {
     // Success response
     res.status(200).json({
       success: true,
-      message: "Sub Section updated successfully!"
+      message: "Lecture updated successfully!"
     })
   } catch (error) {
     res.status(500).json({
@@ -147,7 +147,7 @@ exports.deleteSubSection = async (req, res) => {
     // Success response
     res.status(200).json({
       success: true,
-      message: "Sub Section deleted successfully!"
+      message: "Lecture deleted successfully!"
     })
   } catch (error) {
     res.status(500).json({
