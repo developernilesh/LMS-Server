@@ -71,7 +71,7 @@ exports.editCourse = async (req, res) => {
     // fetching data from req
     const { courseName, courseDescription, whatYouWillLearn, price, category, instructions, tags, courseId } = req.body
     const thumbnailImage = req.files?.thumbnail
-    console.log(req.files)
+    
     // input validation
     if (!courseName || !courseDescription || !whatYouWillLearn || !price || !category || !instructions || !tags) {
       return res.status(400).json({
@@ -90,13 +90,32 @@ exports.editCourse = async (req, res) => {
     if (!courseDetails) {
       return res.status(400).json({
         success: false,
-        message: "Cannot Fetch Instructor Details!"
+        message: "Cannot edit course at moment. Please try again!"
       })
     }
     
     // updating the fields
     let updatedFields = { courseName, courseDescription, whatYouWillLearn, price, category, 
       instructions: JSON.parse(instructions), tags: JSON.parse(tags) }
+      
+    if(category !== courseDetails.category.toString()){
+      const oldCategoryDetails = await Category.findByIdAndUpdate(
+        courseDetails.category.toString(), { $pull: { courses: courseId } }, { new: true }
+      )
+      if (!oldCategoryDetails) {
+        return res.status(400).json({
+          success: false,
+          message: "Cannot update course category!"
+        })
+      }
+      const newCategoryDetails = await Category.findByIdAndUpdate(category, { $push: { courses: courseId } }, { new: true })
+      if (!newCategoryDetails) {
+        return res.status(400).json({
+          success: false,
+          message: "Cannot update course category!"
+        })
+      }
+    }
     
     // uploading image to cloudinary
     if (thumbnailImage) {
