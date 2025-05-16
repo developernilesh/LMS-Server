@@ -65,7 +65,13 @@ exports.categoryPageDetails = async (req, res) => {
 
     // getting details of category
     const categoryDetails = await Category.findById(categoryId)
-      .populate({ path: "courses", populate: { path: "ratingAndReview" } })
+      .populate({
+        path: "courses",
+        populate: [
+          { path: "ratingAndReview" },
+          { path: "instructor", select: "firstName lastName" },
+        ],
+      })
       .exec();
 
     if (!categoryDetails) {
@@ -77,7 +83,13 @@ exports.categoryPageDetails = async (req, res) => {
 
     // getting most popular courses in the paricular category
     const mostPopular = await Category.findById(categoryId)
-      .populate({ path: "courses", populate: { path: "ratingAndReview" } })
+      .populate({
+        path: "courses",
+        populate: [
+          { path: "ratingAndReview" },
+          { path: "instructor", select: "firstName lastName" },
+        ],
+      })
       .sort({ studentsEnrolled: -1 })
       .limit(10)
       .exec();
@@ -88,12 +100,14 @@ exports.categoryPageDetails = async (req, res) => {
     })
       .sort({ studentsEnrolled: -1 })
       .populate("ratingAndReview")
+      .populate({ path: "instructor", select: "firstName lastName" })
       .exec();
 
     // top selling courses (of all categories)
     const topSellingCourses = await Course.find({})
       .sort({ studentsEnrolled: -1 })
       .populate("ratingAndReview")
+      .populate({ path: "instructor", select: "firstName lastName" })
       .exec();
 
     // returning response
