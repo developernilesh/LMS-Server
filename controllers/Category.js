@@ -94,6 +94,19 @@ exports.categoryPageDetails = async (req, res) => {
       .limit(10)
       .exec();
 
+    // getting newest courses in the particular category
+    const newestCourses = await Category.findById(categoryId)
+      .populate({
+        path: "courses",
+        populate: [
+          { path: "ratingAndReview" },
+          { path: "instructor", select: "firstName lastName" },
+        ],
+      })
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .exec();
+
     // getting top selling courses for different categories
     const differentCategories = await Course.find({
       category: { $ne: categoryId },
@@ -117,6 +130,7 @@ exports.categoryPageDetails = async (req, res) => {
       data: {
         categoryDetails,
         mostPopular,
+        newestCourses,
         differentCategories,
         topSellingCourses,
       },
