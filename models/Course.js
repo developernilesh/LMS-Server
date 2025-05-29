@@ -8,7 +8,7 @@ const courseScehma = new mongoose.Schema({
     required: true,
     ref: "User",
   },
-  whatYouWillLearn: { type: String, trim: true },
+  instructorPromise: { type: String, trim: true },
   courseContent: [
     { type: mongoose.Schema.Types.ObjectId, ref: "Section" },
   ],

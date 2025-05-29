@@ -145,7 +145,7 @@ exports.getCartItems = async (req, res) => {
     const userDetails = await User.findById(userId)
       .populate({ 
         path: "cartItems",
-        select: "courseName courseDescription price thumbNail whatYouWillLearn tags",
+        select: "courseName courseDescription price thumbNail instructorPromise tags",
         populate: [
           {
             path: "instructor",

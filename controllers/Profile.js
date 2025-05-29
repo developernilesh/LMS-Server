@@ -6,7 +6,14 @@ require("dotenv").config();
 exports.updateProfile = async (req, res) => {
   try {
     // fetching data from req body
-    const { firstName, lastName, contact, gender, dateOfBirth = "", about = "" } = req.body;
+    const {
+      firstName,
+      lastName,
+      contact,
+      gender,
+      dateOfBirth = "",
+      about = "",
+    } = req.body;
     const userId = req.user.id;
 
     // input validations
@@ -31,12 +38,12 @@ exports.updateProfile = async (req, res) => {
         message: "User not found. Please try again!",
       });
     }
-    userDetails.firstName = firstName
-    userDetails.lastName = lastName
-    if(userDetails.image?.split('/')[2] === 'api.dicebear.com'){
-      userDetails.image = `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`
+    userDetails.firstName = firstName;
+    userDetails.lastName = lastName;
+    if (userDetails.image?.split("/")[2] === "api.dicebear.com") {
+      userDetails.image = `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`;
     }
-    await userDetails.save()
+    await userDetails.save();
 
     // fetching profile id from user details
     const profileId = userDetails?.additionalDetails;
@@ -67,13 +74,14 @@ exports.updateProfile = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Profile updated sucessfully",
-      userDetails, profileDetails
+      userDetails,
+      profileDetails,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: `Something went wrong: ${error.message}`
-    })
+      message: `Something went wrong: ${error.message}`,
+    });
   }
 };
 
@@ -114,8 +122,8 @@ exports.deleteAccount = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: `Something went wrong: ${error.message}`
-    })
+      message: `Something went wrong: ${error.message}`,
+    });
   }
 };
 
@@ -153,8 +161,8 @@ exports.getAllUserDetails = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: `Something went wrong: ${error.message}`
-    })
+      message: `Something went wrong: ${error.message}`,
+    });
   }
 };
 
@@ -193,7 +201,7 @@ exports.updateDisplayPicture = async (req, res) => {
       process.env.FOLDER_NAME,
       1000,
       1000
-    )
+    );
     if (!image) {
       return res.status(400).json({
         success: false,
@@ -206,7 +214,7 @@ exports.updateDisplayPicture = async (req, res) => {
       { _id: userId },
       { image: image.secure_url },
       { new: true }
-    )
+    );
     if (!updatedProfile) {
       return res.status(400).json({
         success: false,
@@ -219,12 +227,12 @@ exports.updateDisplayPicture = async (req, res) => {
       success: true,
       message: `Image Updated successfully`,
       data: updatedProfile,
-    })
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: `Something went wrong: ${error.message}`
-    })
+      message: `Something went wrong: ${error.message}`,
+    });
   }
 };
 
@@ -243,13 +251,7 @@ exports.getEnrolledCourses = async (req, res) => {
 
     // fetching the user details
     const userDetails = await User.findById(userId)
-      .populate({
-        path: "courses",
-        populate: [
-          { path: "ratingAndReview" },
-          { path: "instructor", select: "firstName lastName" },
-        ],
-      })
+      .populate({ path: "courses", populate: { path: "ratingAndReview" } })
       .exec();
 
     if (!userDetails) {
@@ -268,7 +270,7 @@ exports.getEnrolledCourses = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: `Something went wrong: ${error.message}`
-    })
+      message: `Something went wrong: ${error.message}`,
+    });
   }
-}
+};

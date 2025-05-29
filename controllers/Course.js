@@ -7,12 +7,12 @@ require("dotenv").config();
 exports.createCourse = async (req, res) => {
   try {
     // fetching data from req
-    const { courseName, courseDescription, whatYouWillLearn, price, category, instructions, tags, status = "Draft" } = req.body
+    const { courseName, courseDescription, instructorPromise, price, category, instructions, tags, status = "Draft" } = req.body
     const thumbnailImage = req.files.thumbnail
     const instructorId = req.user.id
 
     // input validation
-    if (!courseName || !courseDescription || !whatYouWillLearn || !price || !category || !thumbnailImage || !instructions || !tags) {
+    if (!courseName || !courseDescription || !instructorPromise || !price || !category || !thumbnailImage || !instructions || !tags) {
       return res.status(400).json({
         success: false,
         message: "Please fill all the required fileds!"
@@ -41,7 +41,7 @@ exports.createCourse = async (req, res) => {
 
     // creating course entry in db
     const newCourse = await Course.create({
-      courseName, courseDescription, instructor: instructorDetails._id, whatYouWillLearn, price, thumbNail: thumbNail, 
+      courseName, courseDescription, instructor: instructorDetails._id, instructorPromise, price, thumbNail: thumbNail, 
       category: categoryDetails._id, instructions: JSON.parse(instructions), tags: JSON.parse(tags), status
     })
 
@@ -69,11 +69,11 @@ exports.createCourse = async (req, res) => {
 exports.editCourse = async (req, res) => {
   try {
     // fetching data from req
-    const { courseName, courseDescription, whatYouWillLearn, price, category, instructions, tags, courseId } = req.body
+    const { courseName, courseDescription, instructorPromise, price, category, instructions, tags, courseId } = req.body
     const thumbnailImage = req.files?.thumbnail
     
     // input validation
-    if (!courseName || !courseDescription || !whatYouWillLearn || !price || !category || !instructions || !tags) {
+    if (!courseName || !courseDescription || !instructorPromise || !price || !category || !instructions || !tags) {
       return res.status(400).json({
         success: false,
         message: "Please fill all the required fileds!"
@@ -95,7 +95,7 @@ exports.editCourse = async (req, res) => {
     }
     
     // updating the fields
-    let updatedFields = { courseName, courseDescription, whatYouWillLearn, price, category, 
+    let updatedFields = { courseName, courseDescription, instructorPromise, price, category, 
       instructions: JSON.parse(instructions), tags: JSON.parse(tags) }
       
     if(category !== courseDetails.category.toString()){
