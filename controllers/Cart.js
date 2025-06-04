@@ -311,3 +311,84 @@ exports.enrollToCourse = async (req, res) => {
   }
 }
 
+// enrolling to multiple courses
+exports.enrollToMultipleCourse = async (req, res) => {
+  try {
+    const { courseIds } = req.body; // expects: { courseIds: [id1, id2, ...] }
+    const userId = req.user.id;
+
+    // validations
+    if (!Array.isArray(courseIds) || courseIds.length === 0 || !userId) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid input. Please provide an array of courseIds.",
+      });
+    }
+
+    // Fetch user details
+    const userDetails = await User.findById(userId);
+    if (!userDetails) {
+      return res.status(400).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    let enrolledCourses = [];
+    let alreadyEnrolled = [];
+    let notFound = [];
+    let errors = [];
+
+    for (const courseId of courseIds) {
+      try {
+        const courseDetails = await Course.findById(courseId);
+        if (!courseDetails) {
+          notFound.push(courseId);
+          continue;
+        }
+
+        // Check if already enrolled
+        if (
+          userDetails.courses.includes(courseId) &&
+          courseDetails.studentsEnrolled.includes(userId)
+        ) {
+          alreadyEnrolled.push(courseId);
+          continue;
+        }
+
+        // Enroll user
+        userDetails.courses.push(courseId);
+        courseDetails.studentsEnrolled.push(userId);
+
+        // Remove from cart if present
+        if (userDetails.cartItems.includes(courseId)) {
+          userDetails.cartItems = userDetails.cartItems.filter(
+            (item) => item.toString() !== courseId
+          );
+        }
+
+        await courseDetails.save();
+        enrolledCourses.push(courseId);
+      } catch (err) {
+        errors.push({ courseId, error: err.message });
+      }
+    }
+
+    // Save user after all enrollments
+    await userDetails.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Enrollment process completed.",
+      enrolledCourses,
+      alreadyEnrolled,
+      notFound,
+      errors,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: `Something went wrong: ${error.message}`,
+    });
+  }
+};
