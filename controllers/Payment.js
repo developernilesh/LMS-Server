@@ -1,4 +1,7 @@
 const { razorpayInstance } = require("../config/razorpay");
+const {
+  paymentSuccessEmail,
+} = require("../mail/templates/paymentSuccessEmail");
 const Course = require("../models/Course");
 const User = require("../models/User");
 const mailSender = require("../utils/MailSender");
@@ -68,6 +71,7 @@ exports.capturePayment = async (req, res) => {
       paymentDetails,
     });
   } catch (error) {
+    console.log("err",error)
     res.status(500).json({
       success: false,
       message: `Something went wrong: ${error.message}`,
@@ -106,7 +110,7 @@ exports.verifyPayment = async (req, res) => {
     let body = razorpay_order_id + "|" + razorpay_payment_id;
 
     const expectedSignature = crypto
-      .createHmac("sha256", process.env.RAZORPAY_WEBHOOK_SECRET)
+      .createHmac("sha256", process.env.RAZORPAY_SECRET)
       .update(body.toString())
       .digest("hex");
 
@@ -146,12 +150,19 @@ exports.verifyPayment = async (req, res) => {
     }
     await userDetails.save();
 
-    if(errors.length > 0){
+    if (errors.length > 0) {
       return res.status(400).json({
         success: false,
         message: "Something went wrong while enrollment!",
       });
     }
+
+    // sending confirmation mail
+    await mailSender(
+      userDetails?.email,
+      "Congratulations from LearnVerse!",
+      "Congratulations, you are onboarded into new LearnVerse Course"
+    );
 
     return res.status(200).json({
       success: true,
@@ -162,6 +173,27 @@ exports.verifyPayment = async (req, res) => {
       success: false,
       message: `Something went wrong: ${error.message}`,
     });
+  }
+};
+
+exports.paymentInitiationEmail = async (req, res) => {
+  try {
+    const { orderId, paymentId, amount } = req.body;
+    const userId = req.user?.id;
+
+    const enrolledStudent = await User.findById(userId);
+    await mailSender(
+      enrolledStudent?.email,
+      "Congratulations from LearnVerse!",
+      paymentSuccessEmail(
+        `${enrolledStudent?.firstName} ${enrolledStudent?.lastName}`,
+        `${parseFloat(amount) / 100}`,
+        orderId,
+        paymentId
+      )
+    );
+  } catch (error) {
+    console.error(error);
   }
 };
 
