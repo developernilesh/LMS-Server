@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
   cartItems: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
   courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
   courseProgress: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "CourseProgress" },
+    { type: mongoose.Schema.Types.ObjectId, ref: "SubSection" },
   ],
   token: { type: String },
   resetPasswordExpiresIn: { type: Date },
