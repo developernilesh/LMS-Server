@@ -43,7 +43,7 @@ const {
   removeFromCart,
   getCartItems,
   clearCart,
-  enrollToCourse,
+  toggleCompleteLecture,
 } = require("../controllers/Cart");
 
 // ******************************************************************************************************************
@@ -115,8 +115,8 @@ router.get("/get-cart-items", auth, isStudent, getCartItems);
 // clearing the cart
 router.post("/clear-cart", auth, isStudent, clearCart);
 
-// enrolling to a course
-router.post("/enroll-to-course", auth, isStudent, enrollToCourse);
+// mark and unmark video lecture
+router.post("/toggle-marking-lecture", auth, isStudent, toggleCompleteLecture);
 
 // ********************************************************************************************************
 //                                      Rating and Review
