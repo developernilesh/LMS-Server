@@ -13,6 +13,7 @@ const authRoutes = require("./routes/User");
 const profileRoutes = require("./routes/Profile");
 const courseRoutes = require("./routes/Course");
 const paymentRoutes = require("./routes/Payment");
+const contactRoutes = require("./routes/ContactUs");
 
 // connecting to database
 const { dbConnect } = require("./config/database");
@@ -38,6 +39,7 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/profile", profileRoutes);
 app.use("/api/v1/course", courseRoutes);
 app.use("/api/v1/payment", paymentRoutes);
+app.use("/api/v1/contact", contactRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
