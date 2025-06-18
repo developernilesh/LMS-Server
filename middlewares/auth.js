@@ -29,9 +29,9 @@ exports.auth = (req, res, next) => {
     // allowing to go to the next middleware
     next();
   } catch (error) {
-    return res.status(400).json({
+    return res.status(401).json({
       successs: false,
-      message: "Something went wrong while verifying token"
+      message: "Session Expired!"
     })
   }
 };
