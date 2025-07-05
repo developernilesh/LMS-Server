@@ -6,10 +6,7 @@ const User = require("../models/User");
 exports.auth = (req, res, next) => {
   try {
     // fetching the token
-    const token =
-      req.cookies.token ||
-      req.body.token ||
-      req.header("Authorization").replace("Bearer ", "");
+    const token = req.header("Authorization").replace("Bearer ", "") || req.cookies.token || req.body.token;
 
     // checking if token exists
     if (!token) {
@@ -35,7 +32,7 @@ exports.auth = (req, res, next) => {
     return res.status(401).json({
       successs: false,
       message: "Session Expired!",
-      error: `Call error: ${error.message || 'Error cant found'}`,
+      error: `Auth error: ${error.message || "Error can't be found"}`,
     });
   }
 };
