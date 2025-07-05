@@ -35,7 +35,7 @@ exports.auth = (req, res, next) => {
     return res.status(401).json({
       successs: false,
       message: "Session Expired!",
-      error,
+      error: `Call error: ${error.message || 'Error cant found'}`,
     });
   }
 };
