@@ -217,7 +217,7 @@ exports.login = async (req, res) => {
       .json({
         success: true,
         tokenExpiresIn: Date.now() + 3 * 24 * 60 * 60 * 1000,
-        user,
+        token,
         message: "User logged in successfully",
       });
   } catch (error) {
