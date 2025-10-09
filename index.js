@@ -1,6 +1,7 @@
 // instantiating express app
 const express = require("express");
 const app = express();
+const cors = require("cors");
 require("dotenv").config();
 
 // importing middleware
