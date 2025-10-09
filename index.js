@@ -1,7 +1,6 @@
 // instantiating express app
 const express = require("express");
 const app = express();
-const cors = require("cors");
 require("dotenv").config();
 
 // importing middleware
@@ -27,7 +26,7 @@ cloudinaryConnect();
 // middleware
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: "*", credentials: true }));
+app.use(cors({ origin: process.env.FRONTEND_URL || "*", credentials: true }));
 app.use(
   fileUpload({
     useTempFiles: true,
@@ -48,7 +47,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({
     success: false,
     message: "Internal Server Error",
-    error: err.message,
+    error: err.message
   });
 });
 
