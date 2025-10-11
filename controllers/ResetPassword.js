@@ -45,7 +45,7 @@ exports.resetPasswordToken = async (req, res) => {
     const url = `${process.env.FRONTEND_URL}/update-password/${token}`
 
     // sending mail containing the url
-    await mailSender(email, "Password reset link", `Password reset link : ${url}`);
+    await mailSender(email, "Password reset link", `Password reset link : <a href=${url}>Click Here</a>`);
 
     // returning response
     res.status(200).json({
