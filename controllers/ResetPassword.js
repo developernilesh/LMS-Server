@@ -2,7 +2,7 @@ const User = require("../models/User");
 const mailSender = require("../utils/MailSender");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
-require("dotenv").config()
+require("dotenv").config();
 
 // generate token
 exports.resetPasswordToken = async (req, res) => {
@@ -42,22 +42,27 @@ exports.resetPasswordToken = async (req, res) => {
     }
 
     // creating the unique url
-    const url = `${process.env.FRONTEND_URL}/update-password/${token}`
+    const url = `${process.env.FRONTEND_URL}/update-password/${token}`;
 
     // sending mail containing the url
-    await mailSender(email, "Password reset link", `Password reset link : <a href=${url}>Click Here</a>`);
+    await mailSender(
+      email,
+      "Password reset link",
+      `Password reset link : <a href=${url} style="color: #007bff; text-decoration: underline;">Click Here</a>`
+    );
 
     // returning response
     res.status(200).json({
       success: true,
-      message: "Email sent successfully. Please check email and change password.",
-      url
-    })
+      message:
+        "Email sent successfully. Please check email and change password.",
+      url,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Something went wrong while sending mail for reset password"
-    })
+      message: "Something went wrong while sending mail for reset password",
+    });
   }
 };
 
@@ -78,7 +83,8 @@ exports.resetPassword = async (req, res) => {
     if (resetPassword !== confirmResetPassword) {
       return res.status(400).json({
         success: false,
-        message: "Confirm password doesn't match the original Password. Please try again!"
+        message:
+          "Confirm password doesn't match the original Password. Please try again!",
       });
     }
 
@@ -90,7 +96,7 @@ exports.resetPassword = async (req, res) => {
     }
 
     // fetching user on the basis of token
-    const user = await User.findOne({ token })
+    const user = await User.findOne({ token });
     if (!user) {
       return res.status(400).json({
         success: false,
@@ -106,16 +112,20 @@ exports.resetPassword = async (req, res) => {
       });
     }
 
-    const isPasswordSameToOldPassword = await bcrypt.compare(resetPassword, user.password);
+    const isPasswordSameToOldPassword = await bcrypt.compare(
+      resetPassword,
+      user.password
+    );
     if (isPasswordSameToOldPassword) {
       return res.status(400).json({
         success: false,
-        message: 'This password already exists in old password. Please enter a new password!'
+        message:
+          "This password already exists in old password. Please enter a new password!",
       });
     }
 
     // hashing the password
-    const hashedResetPassword = await bcrypt.hash(resetPassword, 10)
+    const hashedResetPassword = await bcrypt.hash(resetPassword, 10);
     if (!hashedResetPassword) {
       return res.status(400).json({
         success: false,
@@ -124,7 +134,11 @@ exports.resetPassword = async (req, res) => {
     }
 
     // updating the password of the user in db
-    const resetUserPassword = await User.findOneAndUpdate({ token }, { password: hashedResetPassword }, { new: true })
+    const resetUserPassword = await User.findOneAndUpdate(
+      { token },
+      { password: hashedResetPassword },
+      { new: true }
+    );
     if (!resetUserPassword) {
       return res.status(400).json({
         success: false,
@@ -136,11 +150,11 @@ exports.resetPassword = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Password updated successfully",
-    })
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
-    })
+      message: error.message,
+    });
   }
-}
+};
